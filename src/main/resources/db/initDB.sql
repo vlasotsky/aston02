@@ -5,16 +5,14 @@ DROP TABLE IF EXISTS vinyl_disc;
 DROP TABLE IF EXISTS genre;
 DROP TABLE IF EXISTS instrument;
 
--- CREATE SEQUENCE global_sequence START WITH 100000;
-
 CREATE TABLE genre (
     genre_id SERIAL PRIMARY KEY,
     name     VARCHAR(15) NOT NULL UNIQUE
 );
 
 CREATE TABLE instrument (
-    instr_id SERIAL PRIMARY KEY,
-    instr_name     VARCHAR(15) NOT NULL UNIQUE
+    instr_id   SERIAL PRIMARY KEY,
+    instr_name VARCHAR(15) NOT NULL UNIQUE
 );
 
 CREATE TABLE artist (
