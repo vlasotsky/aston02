@@ -2,12 +2,13 @@ package ru.aston.aston02.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Artist {
-    private String firstName;
-    private String lastName;
-    private Instrument mainInstrument;
-    private List<VinylDisc> musicDiscs;
+    private final String firstName;
+    private final String lastName;
+    private final Instrument mainInstrument;
+    private final List<VinylDisc> musicDiscs;
 
     public Artist(String firstName, String lastName, Instrument mainInstrument) {
         this.firstName = firstName;
@@ -37,5 +38,18 @@ public class Artist {
 
     public List<VinylDisc> getMusicDiscs() {
         return musicDiscs;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Artist)) return false;
+        Artist artist = (Artist) o;
+        return firstName.equals(artist.firstName) && lastName.equals(artist.lastName) && mainInstrument == artist.mainInstrument && musicDiscs.equals(artist.musicDiscs);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(firstName, lastName, mainInstrument, musicDiscs);
     }
 }
