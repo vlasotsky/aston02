@@ -20,7 +20,8 @@ CREATE TABLE artist (
     first_name VARCHAR(15)        NOT NULL,
     last_name  VARCHAR(15)        NOT NULL,
     instr_id   INTEGER            NOT NULL,
-    FOREIGN KEY (instr_id) REFERENCES instrument (instr_id)
+    FOREIGN KEY (instr_id) REFERENCES instrument (instr_id),
+    UNIQUE (first_name, last_name, instr_id)
 );
 
 CREATE TABLE vinyl_disc (
@@ -28,14 +29,14 @@ CREATE TABLE vinyl_disc (
     title        VARCHAR(30) NOT NULL,
     genre_id     INTEGER     NOT NULL,
     label        VARCHAR(20) NOT NULL,
-    release_year DATE        NOT NULL,
+    release_date DATE        NOT NULL,
     FOREIGN KEY (genre_id) REFERENCES genre (genre_id)
 );
 
 CREATE TABLE song (
     song_id  SERIAL PRIMARY KEY,
     title    VARCHAR(30) NOT NULL,
-    duration INTERVAL    NOT NULL,
+    duration INTEGER     NOT NULL,
     disc_id  INTEGER     NOT NULL,
     FOREIGN KEY (disc_id) REFERENCES vinyl_disc (disc_id)
 );
