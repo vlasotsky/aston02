@@ -5,7 +5,6 @@ import ru.aston.aston02.repository.VinylDiscRepository;
 
 import java.util.List;
 
-// TODO: DTO transformation goes here and then will be given to servlet
 public class VinylDiscService {
     private final VinylDiscRepository repository;
 
