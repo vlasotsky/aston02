@@ -4,7 +4,7 @@ import java.util.Objects;
 
 public class Song {
     private final String title;
-    private int duration;
+    private final int duration;
 
     public Song(String title, int duration) {
         this.title = title;

@@ -1,11 +1,7 @@
 package ru.aston.aston02.util;
 
-import ru.aston.aston02.model.Instrument;
-import ru.aston.aston02.model.Song;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class SqlUtil {
@@ -39,37 +35,6 @@ public class SqlUtil {
 
         } catch (SQLException e) {
             e.printStackTrace();
-        }
-    }
-
-    public static int retrieveId(PreparedStatement statement) throws SQLException {
-        ResultSet rs = statement.getGeneratedKeys();
-        if (rs.next()) {
-            return rs.getInt(1);
-        } else {
-            throw new SQLException("Failed to retrieve the ID " + statement.getMetaData());
-        }
-    }
-
-    public static int getInstrumentId(Connection connection, Instrument instrument) throws SQLException {
-        try (PreparedStatement ps = connection.prepareStatement("" +
-                "SELECT instr_id " +
-                "FROM instrument " +
-                "WHERE instr_name=?")) {
-
-            ps.setString(1, instrument.name());
-            return ps.executeQuery().getInt("id");
-        }
-    }
-
-    public static int getSongId(Connection connection, Song song) throws SQLException {
-        try (PreparedStatement ps = connection.prepareStatement("" +
-                "SELECT song_id " +
-                "FROM song " +
-                "WHERE title=?")) {
-
-            ps.setString(1, song.getTitle());
-            return ps.executeQuery().getInt("id");
         }
     }
 
