@@ -1,7 +1,10 @@
 package ru.aston.aston02;
 
-import ru.aston.aston02.repository.VinylDiscRepository;
+import ru.aston.aston02.model.VinylDisc;
+import ru.aston.aston02.repository.Repository;
 import ru.aston.aston02.repository.jdbc.JDBCVinylDiscRepository;
+import ru.aston.aston02.service.Service;
+import ru.aston.aston02.service.VinylDiscService;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,7 +20,7 @@ public class Config {
     private String username;
     private String password;
 
-    private VinylDiscRepository repository;
+    private Repository<Long, VinylDisc> repository;
 
     private Config() {
         try (InputStream inputStream = Config.class.getResourceAsStream(PROPERTIES)) {
@@ -42,7 +45,11 @@ public class Config {
         return DriverManager.getConnection(url, username, password);
     }
 
-    public static VinylDiscRepository getRepository() {
+    public static Repository<Long, VinylDisc> getRepository() {
         return INSTANCE.repository;
+    }
+
+    public static Service getService() {
+        return new VinylDiscService(INSTANCE.repository);
     }
 }
