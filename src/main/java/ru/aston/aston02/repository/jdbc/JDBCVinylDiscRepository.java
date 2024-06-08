@@ -1,7 +1,7 @@
 package ru.aston.aston02.repository.jdbc;
 
 import ru.aston.aston02.model.*;
-import ru.aston.aston02.repository.VinylDiscRepository;
+import ru.aston.aston02.repository.Repository;
 import ru.aston.aston02.util.SqlUtil;
 
 import java.sql.*;
@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JDBCVinylDiscRepository implements VinylDiscRepository {
+public class JDBCVinylDiscRepository implements Repository<Long, VinylDisc> {
     private final SqlUtil sqlUtil;
 
     public JDBCVinylDiscRepository(String url, String user, String password) {
@@ -20,7 +20,7 @@ public class JDBCVinylDiscRepository implements VinylDiscRepository {
     public void save(VinylDisc disc) {
         sqlUtil.executeTransaction(connection -> {
             try {
-                final int discId = saveVinyl(connection, disc);
+                final long discId = saveVinyl(connection, disc);
                 saveArtists(connection, disc, discId);
                 saveSong(connection, disc, discId);
             } catch (SQLException e) {
@@ -31,7 +31,7 @@ public class JDBCVinylDiscRepository implements VinylDiscRepository {
     }
 
     @Override
-    public VinylDisc get(int id) {
+    public VinylDisc get(Long id) {
         final VinylDisc[] foundDisc = new VinylDisc[1];
 
         sqlUtil.executeTransaction(connection -> {
@@ -41,7 +41,7 @@ public class JDBCVinylDiscRepository implements VinylDiscRepository {
                             "INNER JOIN genre AS gr USING(genre_id) " +
                             "WHERE disc_id=?;")) {
 
-                        statement.setInt(1, id);
+                        statement.setLong(1, id);
                         final ResultSet rs = statement.executeQuery();
 
                         if (rs.next()) {
@@ -68,7 +68,7 @@ public class JDBCVinylDiscRepository implements VinylDiscRepository {
 
 
     @Override
-    public void update(int id, VinylDisc disc) {
+    public void update(Long id, VinylDisc disc) {
         sqlUtil.executeTransaction(connection -> {
             try (PreparedStatement updateBasic = connection.prepareStatement("" +
                     "INSERT INTO vinyl_disc(disc_id, title, genre_id, label, release_date) " +
@@ -95,7 +95,7 @@ public class JDBCVinylDiscRepository implements VinylDiscRepository {
                          "VALUES(?, ?, ?) ON CONFLICT DO NOTHING;")
             ) {
 
-                updateBasic.setInt(1, id);
+                updateBasic.setLong(1, id);
                 updateBasic.setString(2, disc.getTitle());
                 updateBasic.setInt(3, getGenreIndex(connection, disc.getGenre()));
                 updateBasic.setString(4, disc.getLabel());
@@ -103,11 +103,11 @@ public class JDBCVinylDiscRepository implements VinylDiscRepository {
 
                 updateBasic.executeUpdate();
 
-                clearSongs.setInt(1, id);
+                clearSongs.setLong(1, id);
                 clearSongs.executeUpdate();
 
                 for (Song song : disc.getSongs()) {
-                    updateSongs.setInt(1, id);
+                    updateSongs.setLong(1, id);
                     updateSongs.setString(2, song.getTitle());
                     updateSongs.setInt(3, song.getDuration());
 
@@ -116,7 +116,7 @@ public class JDBCVinylDiscRepository implements VinylDiscRepository {
 
                 updateSongs.executeBatch();
 
-                clearArtists.setInt(1, id);
+                clearArtists.setLong(1, id);
                 clearArtists.executeUpdate();
 
                 saveArtists(connection, disc, id);
@@ -127,7 +127,7 @@ public class JDBCVinylDiscRepository implements VinylDiscRepository {
     }
 
     @Override
-    public void delete(int id) {
+    public void delete(Long id) {
         sqlUtil.executeTransaction(connection -> {
             try (PreparedStatement psDeleteJoin = connection.prepareStatement("" +
                     "DELETE FROM vinyl_disc_artist " +
@@ -139,9 +139,9 @@ public class JDBCVinylDiscRepository implements VinylDiscRepository {
                          "DELETE FROM vinyl_disc " +
                          "WHERE disc_id=?;")) {
 
-                psDeleteJoin.setInt(1, id);
-                psDeleteSong.setInt(1, id);
-                psDeleteDisc.setInt(1, id);
+                psDeleteJoin.setLong(1, id);
+                psDeleteSong.setLong(1, id);
+                psDeleteDisc.setLong(1, id);
 
                 if (psDeleteJoin.executeUpdate() == 0) {
                     throw new IllegalArgumentException("No such disc with id: " + id);
@@ -171,7 +171,7 @@ public class JDBCVinylDiscRepository implements VinylDiscRepository {
                     final String label = rs.getString("label");
                     final LocalDate releaseDate = LocalDate.parse(rs.getString("release_date"));
 
-                    final int discId = rs.getInt("disc_id");
+                    final long discId = rs.getLong("disc_id");
                     final List<Song> songs = getSongs(connection, discId);
                     final List<Artist> artists = getArtists(connection, discId);
 
@@ -203,7 +203,7 @@ public class JDBCVinylDiscRepository implements VinylDiscRepository {
         }
     }
 
-    private int saveVinyl(Connection connection, VinylDisc disc) throws SQLException {
+    private Long saveVinyl(Connection connection, VinylDisc disc) throws SQLException {
         try (PreparedStatement psVinyl = connection.prepareStatement("" +
                 "INSERT INTO vinyl_disc(title, genre_id, label, release_date) " +
                 "VALUES(?, ?, ?, ?);", Statement.RETURN_GENERATED_KEYS)) {
@@ -218,7 +218,7 @@ public class JDBCVinylDiscRepository implements VinylDiscRepository {
         }
     }
 
-    private void saveArtists(Connection connection, VinylDisc disc, int discId) throws SQLException {
+    private void saveArtists(Connection connection, VinylDisc disc, Long discId) throws SQLException {
         try (PreparedStatement psArtist = connection.prepareStatement("" +
                 "INSERT INTO artist(first_name, last_name, instr_id) " +
                 "VALUES(?, ?, ?) ON CONFLICT DO NOTHING;", Statement.RETURN_GENERATED_KEYS);
@@ -246,7 +246,7 @@ public class JDBCVinylDiscRepository implements VinylDiscRepository {
                     psJoin.setInt(1, rsArtistId.getInt(1));
                 }
 
-                psJoin.setInt(2, discId);
+                psJoin.setLong(2, discId);
 
                 psJoin.addBatch();
             }
@@ -254,7 +254,7 @@ public class JDBCVinylDiscRepository implements VinylDiscRepository {
         }
     }
 
-    private void saveSong(Connection connection, VinylDisc disc, int discId) throws SQLException {
+    private void saveSong(Connection connection, VinylDisc disc, Long discId) throws SQLException {
         try (PreparedStatement psSong = connection.prepareStatement("" +
                 "INSERT INTO song(title, duration, disc_id) " +
                 "VALUES(?, ?, ?);")) {
@@ -262,7 +262,7 @@ public class JDBCVinylDiscRepository implements VinylDiscRepository {
             for (Song song : disc.getSongs()) {
                 psSong.setString(1, song.getTitle());
                 psSong.setInt(2, song.getDuration());
-                psSong.setInt(3, discId);
+                psSong.setLong(3, discId);
 
                 psSong.addBatch();
             }
@@ -272,12 +272,12 @@ public class JDBCVinylDiscRepository implements VinylDiscRepository {
     }
 
 
-    private List<Song> getSongs(Connection connection, int id) throws SQLException {
+    private List<Song> getSongs(Connection connection, Long id) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement("" +
                 "SELECT title, duration " +
                 "FROM song " +
                 "WHERE disc_id=?;")) {
-            statement.setInt(1, id);
+            statement.setLong(1, id);
             final ResultSet rs = statement.executeQuery();
             List<Song> songs = new ArrayList<>();
 
@@ -291,7 +291,7 @@ public class JDBCVinylDiscRepository implements VinylDiscRepository {
         }
     }
 
-    private List<Artist> getArtists(Connection connection, int id) throws SQLException {
+    private List<Artist> getArtists(Connection connection, Long id) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement("" +
                 "SELECT ar.artist_id, ar.first_name, ar.last_name, instr.instr_name " +
                 "FROM vinyl_disc_artist vda " +
@@ -299,7 +299,7 @@ public class JDBCVinylDiscRepository implements VinylDiscRepository {
                 "INNER JOIN instrument instr ON ar.instr_id = instr.instr_id " +
                 "WHERE vda.disc_id=?;")) {
 
-            statement.setInt(1, id);
+            statement.setLong(1, id);
             final ResultSet rs = statement.executeQuery();
             List<Artist> artists = new ArrayList<>();
 
@@ -347,10 +347,10 @@ public class JDBCVinylDiscRepository implements VinylDiscRepository {
         }
     }
 
-    public static int retrieveId(PreparedStatement statement) throws SQLException {
+    public static long retrieveId(PreparedStatement statement) throws SQLException {
         ResultSet rs = statement.getGeneratedKeys();
         if (rs.next()) {
-            return rs.getInt(1);
+            return rs.getLong(1);
         } else {
             throw new SQLException("Failed to retrieve the ID: (" + statement.getMetaData() + ")");
         }
