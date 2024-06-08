@@ -6,7 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.PostgreSQLContainer;
 import ru.aston.aston02.model.*;
-import ru.aston.aston02.repository.VinylDiscRepository;
+import ru.aston.aston02.repository.Repository;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,11 +18,12 @@ import java.util.List;
 import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static ru.aston.aston02.TestData.*;
 
 class JDBCVinylDiscRepositoryTest {
     private static PostgreSQLContainer<?> container;
     private static final Properties PROPERTIES;
-    private static VinylDiscRepository repository;
+    private static Repository<Long, VinylDisc> repository;
 
     public static String dbUrl;
     public static String dbUsername;
@@ -30,25 +31,9 @@ class JDBCVinylDiscRepositoryTest {
     public static String initScript;
     public static final String DB_NAME;
 
-    public static final VinylDisc DUMMY_DISC;
-    public static final VinylDisc DUMMY_DISC_CHANGED;
-
-    public static final String DUMMY_STRING;
-    public static final int DUMMY_INT;
-    public static final List<Artist> DUMMY_ARTISTS;
-    public static final List<Song> DUMMY_SONGS;
-
     static {
         DB_NAME = "vinyl_collection";
         PROPERTIES = new Properties();
-
-        DUMMY_STRING = "DUMMY";
-        DUMMY_INT = 999999;
-        DUMMY_ARTISTS = List.of(new Artist("Artist", "Artist", Instrument.VOCALS));
-        DUMMY_SONGS = List.of(new Song(DUMMY_STRING, 0));
-
-        DUMMY_DISC = new VinylDisc(DUMMY_STRING, DUMMY_ARTISTS, DUMMY_SONGS, Genre.FUNK, DUMMY_STRING, LocalDate.now());
-        DUMMY_DISC_CHANGED = new VinylDisc(DUMMY_STRING, DUMMY_ARTISTS, DUMMY_SONGS, Genre.POP, DUMMY_STRING, LocalDate.now());
     }
 
     @BeforeAll
@@ -75,8 +60,6 @@ class JDBCVinylDiscRepositoryTest {
         dbUrl = container.getJdbcUrl();
 
         repository = new JDBCVinylDiscRepository(dbUrl, dbUsername, dbPassword);
-
-//        repository.save(DUMMY_DISC);
     }
 
     @AfterAll
@@ -104,7 +87,7 @@ class JDBCVinylDiscRepositoryTest {
 
         repository.save(expected);
 
-        final VinylDisc actual = repository.get(2);
+        final VinylDisc actual = repository.get(2L);
 
         assertNotNull(actual);
         assertEquals(expected, actual);
@@ -112,39 +95,39 @@ class JDBCVinylDiscRepositoryTest {
 
     @Test
     void get() {
-        final VinylDisc actual = repository.get(1);
+        final VinylDisc actual = repository.get(1L);
 
         assertEquals(DUMMY_DISC, actual);
     }
 
     @Test
     void getNotExisting() {
-        assertThrows(IllegalArgumentException.class, () -> repository.get(DUMMY_INT));
+        assertThrows(IllegalArgumentException.class, () -> repository.get(DUMMY_LONG));
     }
 
     @Test
     void update() {
-        final VinylDisc beforeUpdate = repository.get(1);
+        final VinylDisc beforeUpdate = repository.get(1L);
         assertEquals(DUMMY_DISC, beforeUpdate);
 
-        repository.update(1, DUMMY_DISC_CHANGED);
+        repository.update(1L, DUMMY_DISC_CHANGED);
 
-        final VinylDisc actual = repository.get(1);
+        final VinylDisc actual = repository.get(1L);
         assertEquals(DUMMY_DISC_CHANGED, actual);
     }
 
     @Test
     void delete() {
         repository.save(DUMMY_DISC_CHANGED);
-        final VinylDisc savedDisc = repository.get(2);
+        final VinylDisc savedDisc = repository.get(2L);
 
-        repository.delete(2);
-        assertThrows(IllegalArgumentException.class, () -> repository.get(2));
+        repository.delete(2L);
+        assertThrows(IllegalArgumentException.class, () -> repository.get(2L));
     }
 
     @Test
     void deleteNotExisting() {
-        assertThrows(IllegalArgumentException.class, () -> repository.delete(DUMMY_INT));
+        assertThrows(IllegalArgumentException.class, () -> repository.delete(DUMMY_LONG));
     }
 
     @Test
