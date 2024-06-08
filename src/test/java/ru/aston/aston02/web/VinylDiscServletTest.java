@@ -1,30 +1,77 @@
 package ru.aston.aston02.web;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import ru.aston.aston02.model.VinylDisc;
+import ru.aston.aston02.service.Service;
 
-public class VinylDiscServletTest {
-    //мокаем сервис и другие зависимости
-    // проевряем логику роута на нужные метода
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletInputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Collections;
 
-    @Before
-    public void setUp() throws Exception {
-    }
+import static org.mockito.Mockito.*;
 
-    @After
-    public void tearDown() throws Exception {
+class VinylDiscServletTest {
+
+    @Mock
+    private Service service;
+
+    @InjectMocks
+    private VinylDiscServlet servlet;
+
+    @BeforeEach
+    void setUp() throws ServletException {
+        MockitoAnnotations.openMocks(this);
+        servlet.init(mock(ServletConfig.class));
     }
 
     @Test
-    public void init() {
+    void testDoGet() throws Exception {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+
+        when(service.getAll()).thenReturn(Collections.emptyList());
+
+        when(request.getPathInfo()).thenReturn("/");
+        when(response.getWriter()).thenReturn(printWriter);
+
+        servlet.doGet(request, response);
+
+        printWriter.flush();
+        String expectedJson = "[]";
+        verify(response).setContentType("application/json");
+        verify(response).setCharacterEncoding("UTF-8");
+        verify(response).getWriter();
+        verify(response.getWriter()).write(expectedJson);
     }
 
     @Test
-    public void doGet() {
-    }
+    void testDoPost() throws Exception {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        InputStream inputStream = new ByteArrayInputStream("{\"title\":\"Test Disc\",\"artist\":\"Test Artist\",\"year\":2022}".getBytes());
 
-    @Test
-    public void doPost() {
+        doNothing().when(service).save(any(VinylDisc.class));
+
+        when(request.getPathInfo()).thenReturn("/");
+        when(request.getInputStream()).thenReturn((ServletInputStream) inputStream);
+
+        servlet.doPost(request, response);
+
+        verify(service).save(any(VinylDisc.class));
     }
 }
+
+
