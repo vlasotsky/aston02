@@ -1,80 +1,95 @@
 package ru.aston.aston02.web;
 
+import com.google.gson.Gson;
 import ru.aston.aston02.Config;
-import ru.aston.aston02.model.*;
-import ru.aston.aston02.service.VinylDiscService;
+import ru.aston.aston02.model.VinylDisc;
+import ru.aston.aston02.model.to.VinylDiscDto;
+import ru.aston.aston02.service.Service;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.time.LocalDate;
-import java.util.ArrayList;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
 
-import static ru.aston.aston02.util.ConverterToDto.getSingleTo;
-import static ru.aston.aston02.util.ConverterToDto.getTos;
+import static ru.aston.aston02.util.DtoMapper.*;
 
+@WebServlet(name = "VinylDiscServlet", value = "/v1/vinyl-collection/discs")
 public class VinylDiscServlet extends HttpServlet {
 
-    private VinylDiscService service;
+    private Service service;
+    private Gson gson;
 
     @Override
-    public void init() throws ServletException {
-        service = new VinylDiscService(Config.getRepository());
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+        service = Config.getService();
+        gson = new Gson();
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        final String action = request.getParameter("action");
-        final List<VinylDisc> discList = service.getAll();
+        String pathInfo = request.getPathInfo();
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
 
-        switch (action) {
-            case "view" -> request.setAttribute("all_discs", getTos(discList));
-            case "get" -> {
-                String discId = Objects.requireNonNull(request.getParameter("disc_id"));
+        final List<VinylDisc> allDiscs = service.getAll();
 
-                request.setAttribute("disc", getSingleTo(service.get(Integer.parseInt(discId)), discList));
+        if (pathInfo == null || pathInfo.equals("/")) {
+            response.getWriter().write(gson.toJson(getAllDtos(allDiscs)));
+        } else {
 
+            final String[] subPath = pathInfo.split("/");
+
+            if (subPath.length != 2 || !subPath[1].matches("\\d+")) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                return;
             }
-            default -> throw new IllegalArgumentException("Unknown action " + action);
-        }
 
-        request.getRequestDispatcher("").forward(request, response);
+            final Long parsedId = Long.valueOf(subPath[1]);
+            final VinylDisc retrieved = service.get(parsedId);
+
+            if (retrieved == null) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                return;
+            }
+
+            response.getWriter().write(gson.toJson(getDto(retrieved, allDiscs)));
+        }
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        final String id = Objects.requireNonNull(request.getParameter("id"));
-        final String title = Objects.requireNonNull(request.getParameter("title"));
-        final String genre = Objects.requireNonNull(request.getParameter("genre"));
-        final String label = Objects.requireNonNull(request.getParameter("label"));
-        final String releaseYear = Objects.requireNonNull(request.getParameter("release_date"));
+        final String pathInfo = request.getPathInfo();
 
+        boolean isRequestBodyEmpty = request.getInputStream().available() == 0;
+        final boolean isRoot = pathInfo == null || pathInfo.equals("/");
 
-        final String[] songTitles = Objects.requireNonNull(request.getParameterValues("titles"));
-        final String[] songDurations = Objects.requireNonNull(request.getParameterValues("durations"));
+        if (isRequestBodyEmpty) {
+            final String[] subPath = pathInfo.split("/");
 
-        List<Song> songList = new ArrayList<>();
+            if (subPath.length != 2 || !subPath[1].matches("\\d+")) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            }
 
-        for (int i = 0; i < songTitles.length; i++) {
-            songList.add(new Song(songTitles[i], Integer.parseInt(songDurations[i])));
+            final Long parsedId = Long.valueOf(subPath[1]);
+            service.delete(parsedId);
+
+        } else {
+            VinylDiscDto newDisc = gson.fromJson(new InputStreamReader(request.getInputStream(), StandardCharsets.UTF_8), VinylDiscDto.class);
+
+            if (isRoot) {
+                service.save(getEntity(newDisc));
+            } else {
+                final String disc_id = Objects.requireNonNull(request.getParameter("disc_id"));
+                service.update(Long.valueOf(disc_id), getEntity(newDisc));
+            }
         }
-
-
-        final String[] artistNames = Objects.requireNonNull(request.getParameterValues("first_names"));
-        final String[] lastNames = Objects.requireNonNull(request.getParameterValues("last_names"));
-        final String[] instruments = Objects.requireNonNull(request.getParameterValues("instrument"));
-
-        List<Artist> artistList = new ArrayList<>();
-
-        for (int i = 0; i < artistNames.length; i++) {
-            artistList.add(new Artist(artistNames[i], lastNames[i], Instrument.valueOf(instruments[i])));
-        }
-
-        service.update(Integer.parseInt(id), new VinylDisc(title, artistList, songList, Genre.valueOf(genre), label, LocalDate.parse(releaseYear)));
-        response.sendRedirect("");
     }
 }
