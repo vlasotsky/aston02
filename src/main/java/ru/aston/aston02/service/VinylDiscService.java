@@ -1,14 +1,14 @@
 package ru.aston.aston02.service;
 
 import ru.aston.aston02.model.VinylDisc;
-import ru.aston.aston02.repository.VinylDiscRepository;
+import ru.aston.aston02.repository.Repository;
 
 import java.util.List;
 
-public class VinylDiscService {
-    private final VinylDiscRepository repository;
+public class VinylDiscService implements Service {
+    private final Repository<Long, VinylDisc> repository;
 
-    public VinylDiscService(VinylDiscRepository repository) {
+    public VinylDiscService(Repository<Long, VinylDisc> repository) {
         this.repository = repository;
     }
 
@@ -16,15 +16,15 @@ public class VinylDiscService {
         repository.save(disc);
     }
 
-    public VinylDisc get(int id) {
+    public VinylDisc get(Long id) {
         return repository.get(id);
     }
 
-    public void update(int id, VinylDisc disc) {
+    public void update(Long id, VinylDisc disc) {
         repository.update(id, disc);
     }
 
-    public void delete(int id) {
+    public void delete(Long id) {
         repository.delete(id);
     }
 
