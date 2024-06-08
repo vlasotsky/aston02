@@ -1,5 +1,7 @@
 package ru.aston.aston02.model;
 
+import ru.aston.aston02.model.to.VinylDiscDto;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
@@ -19,6 +21,15 @@ public class VinylDisc {
         this.genre = genre;
         this.label = label;
         this.releaseDate = releaseDate;
+    }
+
+    public VinylDisc(VinylDiscDto discDto) {
+        this.title = discDto.getTitle();
+        this.artists = discDto.getArtists();
+        this.songs = discDto.getSongs();
+        this.genre = discDto.getGenre();
+        this.label = discDto.getLabel();
+        this.releaseDate = discDto.getReleaseDate();
     }
 
     public String getTitle() {
