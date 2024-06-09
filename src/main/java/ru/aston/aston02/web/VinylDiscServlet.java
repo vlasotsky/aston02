@@ -1,12 +1,10 @@
 package ru.aston.aston02.web;
 
 import com.google.gson.Gson;
-import ru.aston.aston02.Config;
 import ru.aston.aston02.model.VinylDisc;
 import ru.aston.aston02.model.to.VinylDiscDto;
-import ru.aston.aston02.service.Service;
+import ru.aston.aston02.service.VinylDiscServiceImpl;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -23,14 +21,12 @@ import static ru.aston.aston02.util.DtoMapper.*;
 @WebServlet(name = "VinylDiscServlet", value = "/v1/vinyl-collection/discs")
 public class VinylDiscServlet extends HttpServlet {
 
-    private Service service;
-    private Gson gson;
+    private final VinylDiscServiceImpl service;
+    private final Gson gson;
 
-    @Override
-    public void init(ServletConfig config) throws ServletException {
-        super.init(config);
-        service = Config.getService();
-        gson = new Gson();
+    public VinylDiscServlet(VinylDiscServiceImpl service) {
+        this.service = service;
+        this.gson = new Gson();
     }
 
     @Override
@@ -39,7 +35,7 @@ public class VinylDiscServlet extends HttpServlet {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
-        final List<VinylDisc> allDiscs = service.getAll();
+        final List<VinylDisc> allDiscs = service.getAllVinylDiscs();
 
         if (pathInfo == null || pathInfo.equals("/")) {
             response.getWriter().write(gson.toJson(getAllDtos(allDiscs)));
@@ -53,7 +49,7 @@ public class VinylDiscServlet extends HttpServlet {
             }
 
             final Long parsedId = Long.valueOf(subPath[1]);
-            final VinylDisc retrieved = service.get(parsedId);
+            final VinylDisc retrieved = service.getVinylDisc(parsedId);
 
             if (retrieved == null) {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -79,16 +75,16 @@ public class VinylDiscServlet extends HttpServlet {
             }
 
             final Long parsedId = Long.valueOf(subPath[1]);
-            service.delete(parsedId);
+            service.deleteVinylDisc(parsedId);
 
         } else {
             VinylDiscDto newDisc = gson.fromJson(new InputStreamReader(request.getInputStream(), StandardCharsets.UTF_8), VinylDiscDto.class);
 
             if (isRoot) {
-                service.save(getEntity(newDisc));
+                service.saveVinylDisc(getEntity(newDisc));
             } else {
                 final String disc_id = Objects.requireNonNull(request.getParameter("disc_id"));
-                service.update(Long.valueOf(disc_id), getEntity(newDisc));
+                service.updateVinylDisc(Long.valueOf(disc_id), getEntity(newDisc));
             }
         }
     }

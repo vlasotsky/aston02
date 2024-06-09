@@ -17,26 +17,26 @@ import static org.mockito.Mockito.*;
 import static ru.aston.aston02.TestData.DUMMY_DISC;
 
 @ExtendWith(MockitoExtension.class)
-class VinylDiscServiceTest {
+class VinylDiscServiceImplTest {
 
     @Mock
     private Repository<Long, VinylDisc> repository;
 
     @InjectMocks
-    private VinylDiscService service;
+    private VinylDiscServiceImpl service;
 
     @Test
     void save() {
         doNothing().when(repository).save(any(VinylDisc.class));
-        service.save(DUMMY_DISC);
+        service.saveVinylDisc(DUMMY_DISC);
 
         verify(repository, times(1)).save(DUMMY_DISC);
     }
 
     @Test
     void get() {
-        when(service.get(1L)).thenReturn(DUMMY_DISC);
-        final VinylDisc disc = service.get(1L);
+        when(service.getVinylDisc(1L)).thenReturn(DUMMY_DISC);
+        final VinylDisc disc = service.getVinylDisc(1L);
 
         assertEquals(DUMMY_DISC, disc);
         verify(repository, times(1)).get(1L);
@@ -46,7 +46,7 @@ class VinylDiscServiceTest {
     void update() {
         doNothing().when(repository).update(eq(1L), any(VinylDisc.class));
 
-        service.update(1L, DUMMY_DISC);
+        service.updateVinylDisc(1L, DUMMY_DISC);
         verify(repository, times(1)).update(1L, DUMMY_DISC);
     }
 
@@ -54,7 +54,7 @@ class VinylDiscServiceTest {
     void delete() {
         doNothing().when(repository).delete(1L);
 
-        service.delete(1L);
+        service.deleteVinylDisc(1L);
         verify(repository, times(1)).delete(1L);
     }
 
@@ -63,7 +63,7 @@ class VinylDiscServiceTest {
         List<VinylDisc> expected = Collections.singletonList(DUMMY_DISC);
         when(repository.getAll()).thenReturn(expected);
 
-        List<VinylDisc> actual = service.getAll();
+        List<VinylDisc> actual = service.getAllVinylDiscs();
         assertEquals(expected, actual);
         verify(repository, times(1)).getAll();
     }

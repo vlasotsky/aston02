@@ -1,14 +1,14 @@
 package ru.aston.aston02.web;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import ru.aston.aston02.model.VinylDisc;
-import ru.aston.aston02.service.Service;
+import ru.aston.aston02.service.VinylDiscServiceImpl;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.*;
 class VinylDiscServletTest {
 
     @Mock
-    private Service service;
+    private VinylDiscServiceImpl service;
 
     @InjectMocks
     private VinylDiscServlet servlet;
@@ -32,7 +32,6 @@ class VinylDiscServletTest {
     @BeforeEach
     void setUp() throws ServletException {
         MockitoAnnotations.openMocks(this);
-        servlet.init(mock(ServletConfig.class));
     }
 
     @Test
@@ -42,7 +41,7 @@ class VinylDiscServletTest {
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
 
-        when(service.getAll()).thenReturn(Collections.emptyList());
+        when(service.getAllVinylDiscs()).thenReturn(Collections.emptyList());
 
         when(request.getPathInfo()).thenReturn("/");
         when(response.getWriter()).thenReturn(printWriter);
@@ -63,14 +62,14 @@ class VinylDiscServletTest {
         HttpServletResponse response = mock(HttpServletResponse.class);
         InputStream inputStream = new ByteArrayInputStream("{\"title\":\"Test Disc\",\"artist\":\"Test Artist\",\"year\":2022}".getBytes());
 
-        doNothing().when(service).save(any(VinylDisc.class));
+        doNothing().when(service).saveVinylDisc(any(VinylDisc.class));
 
         when(request.getPathInfo()).thenReturn("/");
         when(request.getInputStream()).thenReturn((ServletInputStream) inputStream);
 
         servlet.doPost(request, response);
 
-        verify(service).save(any(VinylDisc.class));
+        verify(service).saveVinylDisc(any(VinylDisc.class));
     }
 }
 
