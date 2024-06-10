@@ -40,7 +40,6 @@ public class VinylDiscServlet extends HttpServlet {
         if (pathInfo == null || pathInfo.equals("/")) {
             response.getWriter().write(gson.toJson(getAllDtos(allDiscs)));
         } else {
-
             final String[] subPath = pathInfo.split("/");
 
             if (subPath.length != 2 || !subPath[1].matches("\\d+")) {

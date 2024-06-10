@@ -14,9 +14,9 @@ import java.util.Properties;
 public class Config {
     private static final Config INSTANCE = new Config();
     private static final String PROPERTIES = "/resources/postgres.properties";
-    private String url;
-    private String username;
-    private String password;
+    private final String url;
+    private final String username;
+    private final String password;
 
     private Repository<Long, VinylDisc> repository;
 
@@ -31,7 +31,7 @@ public class Config {
 
             repository = new JDBCVinylDiscRepository(url, username, password);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Error while reading properties", e);
         }
     }
 
