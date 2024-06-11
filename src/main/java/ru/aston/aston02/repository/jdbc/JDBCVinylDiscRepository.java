@@ -58,7 +58,7 @@ public class JDBCVinylDiscRepository implements Repository<Long, VinylDisc> {
                             throw new IllegalArgumentException("No such element in database with id: " + id);
                         }
                     } catch (SQLException e) {
-                        e.printStackTrace();
+                        throw new SQLException("Error while executing statement", e);
                     }
                 }
         );

@@ -1,7 +1,6 @@
 package ru.aston.aston02.model;
 
 public enum Instrument {
-    // TODO: additional functions for instruments
     VOCALS("Vocals"),
     GUITAR("Guitar"),
     KEYS("Keys"),

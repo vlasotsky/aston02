@@ -3,6 +3,7 @@ package ru.aston.aston02.util;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.SQLTransactionRollbackException;
 
 public class SqlUtil {
 
@@ -20,7 +21,7 @@ public class SqlUtil {
                 connection.commit();
             } catch (SQLException e) {
                 connection.rollback();
-                e.printStackTrace();
+                throw new SQLTransactionRollbackException("Transaction denied", e);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -34,7 +35,7 @@ public class SqlUtil {
             executor.execute(ps);
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Error while executing a single statement", e);
         }
     }
 
