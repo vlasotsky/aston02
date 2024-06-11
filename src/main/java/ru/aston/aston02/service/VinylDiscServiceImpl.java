@@ -5,7 +5,7 @@ import ru.aston.aston02.repository.Repository;
 
 import java.util.List;
 
-public class VinylDiscServiceImpl implements VinylDiscService {
+public class VinylDiscServiceImpl implements VinylDiscService, VinylDiscServiceFactory<Long, VinylDisc> {
     private final Repository<Long, VinylDisc> repository;
 
     public VinylDiscServiceImpl(Repository<Long, VinylDisc> repository) {
@@ -30,5 +30,10 @@ public class VinylDiscServiceImpl implements VinylDiscService {
 
     public List<VinylDisc> getAllVinylDiscs() {
         return repository.getAll();
+    }
+
+    @Override
+    public VinylDiscService create(Repository<Long, VinylDisc> repository) {
+        return new VinylDiscServiceImpl(repository);
     }
 }
