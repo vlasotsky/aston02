@@ -33,7 +33,9 @@ public class VinylDiscServiceImpl implements VinylDiscService, VinylDiscServiceF
     }
 
     @Override
-    public VinylDiscService create(Repository<Long, VinylDisc> repository) {
+    public VinylDiscService getVinylDiscService(Repository<Long, VinylDisc> repository) {
+        // OR return new VinylDiscServiceImpl(Config.getRepository())
+        // -> then change signature as well, delete parameter "repository";
         return new VinylDiscServiceImpl(repository);
     }
 }
