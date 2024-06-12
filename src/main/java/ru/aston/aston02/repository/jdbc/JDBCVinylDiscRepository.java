@@ -24,7 +24,6 @@ public class JDBCVinylDiscRepository implements Repository<Long, VinylDisc> {
                 saveArtists(connection, disc, discId);
                 saveSong(connection, disc, discId);
             } catch (SQLException e) {
-                e.printStackTrace();
                 throw new SQLException("Failed to save a new disc", e);
             }
         });

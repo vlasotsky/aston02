@@ -24,7 +24,7 @@ public class SqlUtil {
                 throw new SQLTransactionRollbackException("Transaction denied", e);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Connection error", e);
         }
     }
 
@@ -35,7 +35,7 @@ public class SqlUtil {
             executor.execute(ps);
 
         } catch (SQLException e) {
-            throw new RuntimeException("Error while executing a single statement", e);
+            throw new RuntimeException("Connection Error", e);
         }
     }
 
