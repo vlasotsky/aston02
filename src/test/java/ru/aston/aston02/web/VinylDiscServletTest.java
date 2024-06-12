@@ -7,9 +7,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import ru.aston.aston02.TestUtil;
 import ru.aston.aston02.model.VinylDisc;
-import ru.aston.aston02.model.to.VinylDiscDto;
 import ru.aston.aston02.service.VinylDiscServiceImpl;
-import ru.aston.aston02.util.DtoMapper;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -23,6 +21,8 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
+import static ru.aston.aston02.TestData.FIRST_ELEMENT_ID;
+import static ru.aston.aston02.TestData.JSON_DISC;
 
 class VinylDiscServletTest {
 
@@ -31,23 +31,23 @@ class VinylDiscServletTest {
 
     @InjectMocks
     private VinylDiscServlet servlet;
+    public static HttpServletRequest request;
+    public static HttpServletResponse response;
 
     @BeforeEach
     void setUp() throws ServletException {
+        request = mock(HttpServletRequest.class);
+        response = mock(HttpServletResponse.class);
         MockitoAnnotations.openMocks(this);
         servlet.init(mock(ServletConfig.class));
     }
 
     @Test
     void testDoGet() throws Exception {
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse response = mock(HttpServletResponse.class);
-
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
 
         List<VinylDisc> discList = Collections.emptyList();
-        List<VinylDiscDto> dtoList = DtoMapper.getAllDtos(discList);
 
         when(request.getPathInfo()).thenReturn("/");
         when(response.getWriter()).thenReturn(printWriter);
@@ -58,7 +58,6 @@ class VinylDiscServletTest {
         verify(response, times(1)).getWriter();
         verify(service, times(1)).getAllVinylDiscs();
 
-
         when(request.getPathInfo()).thenReturn("/1");
 
         servlet.doGet(request, response);
@@ -67,10 +66,7 @@ class VinylDiscServletTest {
     }
 
     @Test
-    void testDoPostEmptyBody() throws Exception {
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse response = mock(HttpServletResponse.class);
-
+    void testDoPostDelete() throws Exception {
         ServletInputStream servletInputStream = mock(ServletInputStream.class);
 
         when(request.getInputStream()).thenReturn(servletInputStream);
@@ -83,39 +79,25 @@ class VinylDiscServletTest {
     }
 
     @Test
-    void testDoPostJsonBody() throws IOException, ServletException {
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse response = mock(HttpServletResponse.class);
-        ServletInputStream inputStream = mock(ServletInputStream.class);
-
-        String json = "{" +
-                "\"title\":\"Test Disc\"," +
-                "\"artists\":[" +
-                "{" +
-                "\"first_name\":\"Test Artist\"," +
-                "\"last_name\":\"test\"," +
-                "\"main_instrument\":\"Vocals\"" +
-                "}]," +
-                "\"songs\":[" +
-                "{" +
-                "\"title\":\"test\"," +
-                "\"duration\":100" +
-                "}]," +
-                "\"genre\":{" +
-                "\"name\":\"test\"" +
-                "}," +
-                "\"label\":\"test\"," +
-                "\"releaseDate\":\"2022-01-01\"," +
-                "\"isFew\":true" +
-                "}";
-
-        when(request.getInputStream()).thenReturn(TestUtil.getServletInputStream(json));
+    void testDoPostSave() throws IOException, ServletException {
+        when(request.getInputStream()).thenReturn(TestUtil.getServletInputStream(JSON_DISC));
         when(request.getPathInfo()).thenReturn("/");
 
         servlet.doPost(request, response);
 
         verify(request, times(1)).getInputStream();
         verify(service, times(1)).saveVinylDisc(any(VinylDisc.class));
+    }
+
+    @Test
+    void testDoPostUpdate() throws IOException, ServletException {
+        when(request.getInputStream()).thenReturn(TestUtil.getServletInputStream(JSON_DISC));
+        when(request.getPathInfo()).thenReturn("/" + FIRST_ELEMENT_ID);
+
+        servlet.doPost(request, response);
+
+        verify(request, times(1)).getInputStream();
+        verify(service, times(1)).updateVinylDisc(anyLong(), any(VinylDisc.class));
     }
 }
 

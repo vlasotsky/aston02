@@ -1,11 +1,13 @@
 package ru.aston.aston02.web;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import ru.aston.aston02.model.VinylDisc;
 import ru.aston.aston02.model.to.VinylDiscDto;
 import ru.aston.aston02.service.VinylDiscServiceImpl;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletInputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -14,7 +16,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Objects;
 
 import static ru.aston.aston02.util.DtoMapper.*;
 
@@ -22,11 +23,12 @@ import static ru.aston.aston02.util.DtoMapper.*;
 public class VinylDiscServlet extends HttpServlet {
 
     private final VinylDiscServiceImpl service;
-    private final Gson gson;
+    private final ObjectMapper objectMapper;
 
     public VinylDiscServlet(VinylDiscServiceImpl service) {
         this.service = service;
-        this.gson = new Gson();
+        this.objectMapper = new ObjectMapper();
+        this.objectMapper.registerModule(new JavaTimeModule());
     }
 
     @Override
@@ -38,7 +40,7 @@ public class VinylDiscServlet extends HttpServlet {
         final List<VinylDisc> allDiscs = service.getAllVinylDiscs();
 
         if (pathInfo == null || pathInfo.equals("/")) {
-            response.getWriter().write(gson.toJson(getAllDtos(allDiscs)));
+            response.getWriter().write(objectMapper.writeValueAsString(getAllDtos(allDiscs)));
         } else {
             final String[] subPath = pathInfo.split("/");
 
@@ -55,7 +57,7 @@ public class VinylDiscServlet extends HttpServlet {
                 return;
             }
 
-            response.getWriter().write(gson.toJson(getDto(retrieved, allDiscs)));
+            response.getWriter().write(objectMapper.writeValueAsString(getDto(retrieved, allDiscs)));
         }
     }
 
@@ -63,28 +65,33 @@ public class VinylDiscServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         final String pathInfo = request.getPathInfo();
 
-        boolean isRequestBodyEmpty = request.getInputStream().available() == 0;
+        final ServletInputStream inputStream = request.getInputStream();
+        boolean isRequestBodyEmpty = inputStream.available() == 0;
         final boolean isRoot = pathInfo == null || pathInfo.equals("/");
 
         if (isRequestBodyEmpty) {
-            final String[] subPath = pathInfo.split("/");
-
-            if (subPath.length != 2 || !subPath[1].matches("\\d+")) {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-            }
-
-            final Long parsedId = Long.valueOf(subPath[1]);
+            final Long parsedId = getParsedId(response, pathInfo);
             service.deleteVinylDisc(parsedId);
 
         } else {
-            VinylDiscDto newDisc = gson.fromJson(new InputStreamReader(request.getInputStream(), StandardCharsets.UTF_8), VinylDiscDto.class);
+            VinylDiscDto newDisc = objectMapper.readValue(new InputStreamReader(inputStream, StandardCharsets.UTF_8), VinylDiscDto.class);
 
             if (isRoot) {
                 service.saveVinylDisc(getEntity(newDisc));
             } else {
-                final String disc_id = Objects.requireNonNull(request.getParameter("disc_id"));
-                service.updateVinylDisc(Long.valueOf(disc_id), getEntity(newDisc));
+                final Long parsedId = getParsedId(response, pathInfo);
+                service.updateVinylDisc(Long.valueOf(parsedId), getEntity(newDisc));
             }
         }
+    }
+
+    private Long getParsedId(HttpServletResponse response, String pathInfo) throws IOException {
+        final String[] subPath = pathInfo.split("/");
+
+        if (subPath.length != 2 || !subPath[1].matches("\\d+")) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+        }
+
+        return Long.valueOf(subPath[1]);
     }
 }

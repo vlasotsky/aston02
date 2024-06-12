@@ -14,6 +14,9 @@ public class TestData {
     public static final List<Artist> DUMMY_ARTISTS;
     public static final List<Song> DUMMY_SONGS;
 
+    public static final String JSON_DISC;
+    public static final String FIRST_ELEMENT_ID;
+
     public static final LocalDate DUMMY_LOCAL_DATE = LocalDate.of(2024, 6, 6);
 
     static {
@@ -24,5 +27,25 @@ public class TestData {
 
         DUMMY_DISC = new VinylDisc(DUMMY_STRING, DUMMY_ARTISTS, DUMMY_SONGS, Genre.FUNK, DUMMY_STRING, DUMMY_LOCAL_DATE);
         DUMMY_DISC_CHANGED = new VinylDisc(DUMMY_STRING, DUMMY_ARTISTS, DUMMY_SONGS, Genre.POP, DUMMY_STRING, LocalDate.now());
+
+        FIRST_ELEMENT_ID = "1";
+        JSON_DISC = "{" +
+                "\"title\":\"Test Disc\"," +
+                "\"artists\":[" +
+                "{" +
+                "\"first_name\":\"Test Artist\"," +
+                "\"last_name\":\"test\"," +
+                "\"main_instrument\":\"VOCALS\"" +
+                "}]," +
+                "\"songs\":[" +
+                "{" +
+                "\"title\":\"test\"," +
+                "\"duration\":100" +
+                "}]," +
+                "\"genre\":\"ROCK\"," +
+                "\"label\":\"test\"," +
+                "\"release_date\":\"2022-01-01\"," +
+                "\"is_few\":true" +
+                "}";
     }
 }

@@ -29,6 +29,11 @@ public class TestUtil {
             public int read() throws IOException {
                 return byteArrayInputStream.read();
             }
+
+            @Override
+            public int available() throws IOException {
+                return byteArrayInputStream.available();
+            }
         };
     }
 }
