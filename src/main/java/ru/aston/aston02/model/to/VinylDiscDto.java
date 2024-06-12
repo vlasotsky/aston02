@@ -1,5 +1,7 @@
 package ru.aston.aston02.model.to;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import ru.aston.aston02.model.Artist;
 import ru.aston.aston02.model.Genre;
 import ru.aston.aston02.model.Song;
@@ -28,7 +30,15 @@ public class VinylDiscDto {
         this.isFew = isFew;
     }
 
-    public VinylDiscDto(String title, List<Artist> artists, List<Song> songs, Genre genre, String label, LocalDate releaseDate, boolean isFew) {
+    @JsonCreator
+    public VinylDiscDto(
+            @JsonProperty("title") String title,
+            @JsonProperty("artists") List<Artist> artists,
+            @JsonProperty("songs") List<Song> songs,
+            @JsonProperty("genre") Genre genre,
+            @JsonProperty("label") String label,
+            @JsonProperty("release_date") LocalDate releaseDate,
+            @JsonProperty("is_few") boolean isFew) {
         this.title = title;
         this.artists = artists;
         this.songs = songs;

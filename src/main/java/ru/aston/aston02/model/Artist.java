@@ -1,5 +1,7 @@
 package ru.aston.aston02.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -10,7 +12,10 @@ public class Artist {
     private final Instrument mainInstrument;
     private final List<VinylDisc> musicDiscs;
 
-    public Artist(String firstName, String lastName, Instrument mainInstrument) {
+    public Artist(
+            @JsonProperty("first_name") String firstName,
+            @JsonProperty("last_name") String lastName,
+            @JsonProperty("main_instrument") Instrument mainInstrument) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.mainInstrument = mainInstrument;

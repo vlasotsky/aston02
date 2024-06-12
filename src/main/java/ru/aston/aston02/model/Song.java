@@ -1,12 +1,16 @@
 package ru.aston.aston02.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Objects;
 
 public class Song {
     private final String title;
     private final int duration;
 
-    public Song(String title, int duration) {
+    public Song(
+            @JsonProperty("title") String title,
+            @JsonProperty("duration") int duration) {
         this.title = title;
         this.duration = duration;
     }
