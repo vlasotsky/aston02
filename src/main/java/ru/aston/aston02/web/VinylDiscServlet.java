@@ -2,13 +2,16 @@ package ru.aston.aston02.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import ru.aston.aston02.Config;
 import ru.aston.aston02.model.VinylDisc;
 import ru.aston.aston02.model.to.VinylDiscDto;
+import ru.aston.aston02.service.VinylDiscService;
+import ru.aston.aston02.service.VinylDiscServiceFactory;
 import ru.aston.aston02.service.VinylDiscServiceImpl;
+import ru.aston.aston02.service.VinylDiscServiceImplFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,11 +22,17 @@ import java.util.List;
 
 import static ru.aston.aston02.util.DtoMapper.*;
 
-@WebServlet(name = "VinylDiscServlet", value = "/v1/vinyl-collection/discs")
 public class VinylDiscServlet extends HttpServlet {
 
-    private final VinylDiscServiceImpl service;
+    private final VinylDiscService service;
     private final ObjectMapper objectMapper;
+
+    public VinylDiscServlet() {
+        VinylDiscServiceFactory<Long, VinylDisc> serviceFactory = new VinylDiscServiceImplFactory();
+        this.service = serviceFactory.getVinylDiscService(Config.getRepository());
+        this.objectMapper = new ObjectMapper();
+        this.objectMapper.registerModule(new JavaTimeModule());
+    }
 
     public VinylDiscServlet(VinylDiscServiceImpl service) {
         this.service = service;
@@ -72,7 +81,6 @@ public class VinylDiscServlet extends HttpServlet {
         if (isRequestBodyEmpty) {
             final Long parsedId = getParsedId(response, pathInfo);
             service.deleteVinylDisc(parsedId);
-
         } else {
             VinylDiscDto newDisc = objectMapper.readValue(new InputStreamReader(inputStream, StandardCharsets.UTF_8), VinylDiscDto.class);
 

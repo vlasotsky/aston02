@@ -1,0 +1,53 @@
+### GET request for all vinyl discs
+GET http://localhost:8080/vinyl-app/v1/vinyl-collection/discs
+Accept: application/json
+
+### GET request for a specific vinyl disc
+GET http://localhost:8080/vinyl-app/v1/vinyl-collection/discs/2
+Accept: application/json
+
+### POST request with json body to save a new Disc
+POST http://localhost:8080/vinyl-app/v1/vinyl-collection/discs
+Content-Type: application/json
+
+{
+  "title": "Ballads",
+  "artists": [
+    {
+      "firstName": "John",
+      "lastName": "Coltrane",
+      "mainInstrument": "SAX"
+    },
+    {
+      "firstName": "Roger",
+      "lastName": "Waters",
+      "mainInstrument": "BASS"
+    }
+  ],
+  "songs": [
+    {
+      "title": "Say It (Over and Over Again)",
+      "duration": 258
+    },
+    {
+      "title": "You Don't Know What Love Is",
+      "duration": 315
+    },
+    {
+      "title": "Too Young to Go Steady",
+      "duration": 263
+    }
+  ],
+  "genre": "JAZZ",
+  "label": "Impulse!",
+  "releaseDate": [
+    1963,
+    1,
+    1
+  ]
+}
+
+
+### POST request for testing DELETE
+POST http://localhost:8080/vinyl-app/v1/vinyl-collection/discs/3
+Accept: application/json

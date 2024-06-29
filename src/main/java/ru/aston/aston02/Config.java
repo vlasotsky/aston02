@@ -4,6 +4,7 @@ import ru.aston.aston02.model.VinylDisc;
 import ru.aston.aston02.repository.Repository;
 import ru.aston.aston02.repository.jdbc.JDBCVinylDiscRepository;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
@@ -13,16 +14,20 @@ import java.util.Properties;
 
 public class Config {
     private static final Config INSTANCE = new Config();
-    private static final String PROPERTIES = "/resources/postgres.properties";
+    private static final String PROPERTIES = "db/postgres.properties";
     private final String url;
     private final String username;
     private final String password;
 
-    private Repository<Long, VinylDisc> repository;
+    private final Repository<Long, VinylDisc> repository;
 
     private Config() {
-        try (InputStream inputStream = Config.class.getResourceAsStream(PROPERTIES)) {
+        try (InputStream inputStream = Config.class.getClassLoader().getResourceAsStream(PROPERTIES)) {
             Properties properties = new Properties();
+            if (inputStream == null) {
+                throw new FileNotFoundException("File was not found under this path: " + PROPERTIES);
+            }
+
             properties.load(inputStream);
 
             url = properties.getProperty("db.url");

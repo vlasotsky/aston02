@@ -13,6 +13,12 @@ public class JDBCVinylDiscRepository implements Repository<Long, VinylDisc> {
     private final SqlUtil sqlUtil;
 
     public JDBCVinylDiscRepository(String url, String user, String password) {
+        try {
+            Class.forName("org.postgresql.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Class loading error", e);
+        }
+
         sqlUtil = new SqlUtil(() -> DriverManager.getConnection(url, user, password));
     }
 

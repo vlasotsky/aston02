@@ -7,7 +7,8 @@ public enum Instrument {
     BASS("Bass"),
     DOUBLE_BASS("Double Bass"),
     BANJO("Banjo"),
-    DRUMS("Drums");
+    DRUMS("Drums"),
+    SAX("Saxophone");
 
     private final String name;
 
