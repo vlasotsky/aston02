@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
 
 public class DtoMapper {
 
+    // Check jenkins
+
     public static final int SUFFICIENT_AMOUNT_FOR_COLLECTION = 3;
 
     private DtoMapper() {
