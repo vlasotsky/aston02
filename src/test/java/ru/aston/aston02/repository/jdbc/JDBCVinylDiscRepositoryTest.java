@@ -6,7 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.PostgreSQLContainer;
 import ru.aston.aston02.model.*;
-import ru.aston.aston02.repository.Repository;
+import ru.aston.aston02.repository.VinylDiscRepository;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,7 +23,7 @@ import static ru.aston.aston02.TestData.*;
 class JDBCVinylDiscRepositoryTest {
     private static PostgreSQLContainer<?> container;
     private static final Properties PROPERTIES;
-    private static Repository<Long, VinylDisc> repository;
+    private static VinylDiscRepository<Long, VinylDisc> repository;
 
     public static String dbUrl;
     public static String dbUsername;
@@ -80,7 +80,7 @@ class JDBCVinylDiscRepositoryTest {
     void save() {
         VinylDisc expected = new VinylDisc("Cold Sweat",
                 List.of(new Artist("James", "Brown",
-                        Instrument.VOCALS)),
+                        Instrument.VOX)),
                 List.of(new Song("Cold sweat", 185), new Song("Let yourself go", 135)),
                 Genre.FUNK, "King", LocalDate.of(1967, 1, 1));
 

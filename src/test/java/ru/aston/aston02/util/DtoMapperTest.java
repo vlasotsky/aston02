@@ -3,7 +3,7 @@ package ru.aston.aston02.util;
 import org.junit.jupiter.api.Test;
 import ru.aston.aston02.model.Genre;
 import ru.aston.aston02.model.VinylDisc;
-import ru.aston.aston02.model.to.VinylDiscDto;
+import ru.aston.aston02.model.dto.VinylDiscDto;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -19,7 +19,7 @@ class DtoMapperTest {
     void getDto() {
         List<VinylDisc> discList = Collections.singletonList(DUMMY_DISC);
 
-        VinylDiscDto dto = DtoMapper.getDto(DUMMY_DISC, discList);
+        VinylDiscDto dto = DtoMapperUtil.getDto(DUMMY_DISC, discList);
 
         assertEquals(DUMMY_STRING, dto.getTitle());
         assertEquals(DUMMY_ARTISTS, dto.getArtists());
@@ -34,7 +34,7 @@ class DtoMapperTest {
     void getTos() {
         List<VinylDisc> discList = Arrays.asList(DUMMY_DISC, DUMMY_DISC_CHANGED);
 
-        List<VinylDiscDto> dtos = DtoMapper.getAllDtos(discList);
+        List<VinylDiscDto> dtos = DtoMapperUtil.getAllDto(discList);
 
         assertEquals(2, dtos.size());
         assertEquals(dtos.get(0).getGenre(), dtos.get(0).getGenre());
