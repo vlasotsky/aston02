@@ -1,7 +1,7 @@
 package ru.aston.aston02.model;
 
 public enum Instrument {
-    VOCALS("Vocals"),
+    VOX("Vocals"),
     GUITAR("Guitar"),
     KEYS("Keys"),
     BASS("Bass"),

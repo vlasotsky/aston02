@@ -1,16 +1,30 @@
 package ru.aston.aston02.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+@Entity
 public class Artist {
-    private final String firstName;
-    private final String lastName;
-    private final Instrument mainInstrument;
-    private final List<VinylDisc> musicDiscs;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long artistId;
+
+    private String firstName;
+    private String lastName;
+
+    @Enumerated(EnumType.STRING)
+    private Instrument mainInstrument;
+
+    @ManyToMany(mappedBy = "artists")
+    private List<VinylDisc> musicDiscs = new ArrayList<>();
+
+    public Artist() {
+    }
 
     public Artist(
             @JsonProperty("first_name") String firstName,
@@ -56,5 +70,13 @@ public class Artist {
     @Override
     public int hashCode() {
         return Objects.hash(firstName, lastName, mainInstrument, musicDiscs);
+    }
+
+    public void setArtistId(Long artistId) {
+        this.artistId = artistId;
+    }
+
+    public Long getArtistId() {
+        return artistId;
     }
 }

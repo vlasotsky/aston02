@@ -1,18 +1,41 @@
 package ru.aston.aston02.model;
 
-import ru.aston.aston02.model.to.VinylDiscDto;
+import jakarta.persistence.*;
+import ru.aston.aston02.model.dto.VinylDiscDto;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+@Entity
+@Table(name = "vinyl_disc")
 public class VinylDisc {
-    private final String title;
-    private final List<Artist> artists;
-    private final List<Song> songs;
-    private final Genre genre;
-    private final String label;
-    private final LocalDate releaseDate;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long discId;
+
+    private String title;
+
+    @ManyToMany
+    @JoinTable(
+            name = "vinyl_disc_artist",
+            joinColumns = {@JoinColumn(name = "disc_id")},
+            inverseJoinColumns = {@JoinColumn(name = "artist_id")}
+    )
+    private List<Artist> artists;
+
+    @OneToMany(mappedBy = "vinylDisc", cascade = CascadeType.ALL)
+    private List<Song> songs = new ArrayList<>();
+
+    @Enumerated(EnumType.STRING)
+    private Genre genre;
+
+    private String label;
+    private LocalDate releaseDate;
+
+    public VinylDisc() {
+    }
 
     public VinylDisc(String title, List<Artist> artists, List<Song> songs, Genre genre, String label, LocalDate releaseDate) {
         this.title = title;
@@ -30,6 +53,10 @@ public class VinylDisc {
         this.genre = discDto.getGenre();
         this.label = discDto.getLabel();
         this.releaseDate = discDto.getReleaseDate();
+    }
+
+    public Long getDiscId() {
+        return discId;
     }
 
     public String getTitle() {
