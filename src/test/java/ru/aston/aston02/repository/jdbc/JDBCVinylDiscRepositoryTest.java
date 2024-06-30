@@ -23,6 +23,7 @@ import static ru.aston.aston02.TestData.*;
 class JDBCVinylDiscRepositoryTest {
     private static PostgreSQLContainer<?> container;
     private static final Properties PROPERTIES;
+
     private static VinylDiscRepository<Long, VinylDisc> repository;
 
     public static String dbUrl;
