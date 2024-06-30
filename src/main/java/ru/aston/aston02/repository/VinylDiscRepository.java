@@ -4,7 +4,7 @@ import ru.aston.aston02.model.VinylDisc;
 
 import java.util.List;
 
-public interface Repository<K, T> {
+public interface VinylDiscRepository<K, T> {
     void save(T disc);
 
     VinylDisc get(K id);

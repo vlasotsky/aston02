@@ -1,7 +1,7 @@
 package ru.aston.aston02.repository.jdbc;
 
 import ru.aston.aston02.model.*;
-import ru.aston.aston02.repository.Repository;
+import ru.aston.aston02.repository.VinylDiscRepository;
 import ru.aston.aston02.util.SqlUtil;
 
 import java.sql.*;
@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JDBCVinylDiscRepository implements Repository<Long, VinylDisc> {
+public class JDBCVinylDiscRepository implements VinylDiscRepository<Long, VinylDisc> {
     private final SqlUtil sqlUtil;
 
     public JDBCVinylDiscRepository(String url, String user, String password) {
