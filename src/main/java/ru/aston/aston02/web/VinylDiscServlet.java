@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import ru.aston.aston02.Config;
 import ru.aston.aston02.model.VinylDisc;
-import ru.aston.aston02.model.to.VinylDiscDto;
+import ru.aston.aston02.model.dto.VinylDiscDto;
 import ru.aston.aston02.service.VinylDiscService;
 import ru.aston.aston02.service.VinylDiscServiceFactory;
 import ru.aston.aston02.service.VinylDiscServiceImpl;
@@ -19,8 +19,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-
-import static ru.aston.aston02.util.DtoMapper.*;
 
 public class VinylDiscServlet extends HttpServlet {
 
@@ -46,10 +44,10 @@ public class VinylDiscServlet extends HttpServlet {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
-        final List<VinylDisc> allDiscs = service.getAllVinylDiscs();
+        final List<VinylDiscDto> allDiscs = service.getAllVinylDiscs();
 
         if (pathInfo == null || pathInfo.equals("/")) {
-            response.getWriter().write(objectMapper.writeValueAsString(getAllDtos(allDiscs)));
+            response.getWriter().write(objectMapper.writeValueAsString(allDiscs));
         } else {
             final String[] subPath = pathInfo.split("/");
 
@@ -59,14 +57,14 @@ public class VinylDiscServlet extends HttpServlet {
             }
 
             final Long parsedId = Long.valueOf(subPath[1]);
-            final VinylDisc retrieved = service.getVinylDisc(parsedId);
+            final VinylDiscDto retrieved = service.getVinylDisc(parsedId);
 
             if (retrieved == null) {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
 
-            response.getWriter().write(objectMapper.writeValueAsString(getDto(retrieved, allDiscs)));
+            response.getWriter().write(objectMapper.writeValueAsString(retrieved));
         }
     }
 
@@ -85,10 +83,10 @@ public class VinylDiscServlet extends HttpServlet {
             VinylDiscDto newDisc = objectMapper.readValue(new InputStreamReader(inputStream, StandardCharsets.UTF_8), VinylDiscDto.class);
 
             if (isRoot) {
-                service.saveVinylDisc(getEntity(newDisc));
+                service.saveVinylDisc(newDisc);
             } else {
                 final Long parsedId = getParsedId(response, pathInfo);
-                service.updateVinylDisc(Long.valueOf(parsedId), getEntity(newDisc));
+                service.updateVinylDisc(parsedId, newDisc);
             }
         }
     }
