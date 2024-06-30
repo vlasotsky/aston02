@@ -2,17 +2,17 @@ package ru.aston.aston02.util;
 
 import ru.aston.aston02.model.Genre;
 import ru.aston.aston02.model.VinylDisc;
-import ru.aston.aston02.model.to.VinylDiscDto;
+import ru.aston.aston02.model.dto.VinylDiscDto;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class DtoMapper {
+public class DtoMapperUtil {
 
     public static final int SUFFICIENT_AMOUNT_FOR_COLLECTION = 3;
 
-    private DtoMapper() {
+    private DtoMapperUtil() {
     }
 
     public static VinylDiscDto getDto(VinylDisc disc, List<VinylDisc> discList) {
@@ -21,7 +21,7 @@ public class DtoMapper {
         return createTo(disc, isFew);
     }
 
-    public static List<VinylDiscDto> getAllDtos(List<VinylDisc> discList) {
+    public static List<VinylDiscDto> getAllDto(List<VinylDisc> discList) {
         final Map<Genre, Long> genreCount = getGenreCount(discList);
         return discList.stream()
                 .map(disc -> createTo(disc, genreCount.get(disc.getGenre()) < SUFFICIENT_AMOUNT_FOR_COLLECTION))
