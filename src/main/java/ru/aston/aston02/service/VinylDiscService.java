@@ -1,17 +1,17 @@
 package ru.aston.aston02.service;
 
-import ru.aston.aston02.model.VinylDisc;
+import ru.aston.aston02.model.dto.VinylDiscDto;
 
 import java.util.List;
 
 public interface VinylDiscService {
-    void saveVinylDisc(VinylDisc disc);
+    void saveVinylDisc(VinylDiscDto disc);
 
-    VinylDisc getVinylDisc(Long id);
+    VinylDiscDto getVinylDisc(Long id);
 
-    void updateVinylDisc(Long id, VinylDisc disc);
+    void updateVinylDisc(Long id, VinylDiscDto disc);
 
     void deleteVinylDisc(Long id);
 
-    List<VinylDisc> getAllVinylDiscs();
+    List<VinylDiscDto> getAllVinylDiscs();
 }

@@ -1,39 +1,46 @@
 package ru.aston.aston02.service;
 
+import org.mapstruct.factory.Mappers;
+import org.springframework.stereotype.Service;
 import ru.aston.aston02.model.VinylDisc;
-import ru.aston.aston02.repository.Repository;
+import ru.aston.aston02.model.dto.VinylDiscDto;
+import ru.aston.aston02.model.dto.VinylDiscDtoMapper;
+import ru.aston.aston02.repository.VinylDiscRepository;
 
 import java.util.List;
 
+@Service
 public class VinylDiscServiceImpl implements VinylDiscService, VinylDiscServiceFactory<Long, VinylDisc> {
-    private final Repository<Long, VinylDisc> repository;
 
-    public VinylDiscServiceImpl(Repository<Long, VinylDisc> repository) {
+    private final VinylDiscRepository<Long, VinylDisc> repository;
+    private final VinylDiscDtoMapper mapper = Mappers.getMapper(VinylDiscDtoMapper.class);
+
+    public VinylDiscServiceImpl(VinylDiscRepository<Long, VinylDisc> repository) {
         this.repository = repository;
     }
 
-    public void saveVinylDisc(VinylDisc disc) {
-        repository.save(disc);
+    public void saveVinylDisc(VinylDiscDto disc) {
+        repository.save(mapper.toEntity(disc));
     }
 
-    public VinylDisc getVinylDisc(Long id) {
-        return repository.get(id);
+    public VinylDiscDto getVinylDisc(Long id) {
+        return mapper.toDto(repository.get(id), repository.getAll());
     }
 
-    public void updateVinylDisc(Long id, VinylDisc disc) {
-        repository.update(id, disc);
+    public void updateVinylDisc(Long id, VinylDiscDto disc) {
+        repository.update(id, mapper.toEntity(disc));
     }
 
     public void deleteVinylDisc(Long id) {
         repository.delete(id);
     }
 
-    public List<VinylDisc> getAllVinylDiscs() {
-        return repository.getAll();
+    public List<VinylDiscDto> getAllVinylDiscs() {
+        return mapper.toDtoAll(repository.getAll());
     }
 
     @Override
-    public VinylDiscService getVinylDiscService(Repository<Long, VinylDisc> repository) {
+    public VinylDiscService getVinylDiscService(VinylDiscRepository<Long, VinylDisc> repository) {
         return new VinylDiscServiceImpl(repository);
     }
 }
