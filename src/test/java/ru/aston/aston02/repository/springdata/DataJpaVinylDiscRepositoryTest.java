@@ -1,13 +1,15 @@
-package ru.aston.aston02.repository.jdbc;
+package ru.aston.aston02.repository.springdata;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import ru.aston.aston02.TestConfig;
 import ru.aston.aston02.model.*;
 import ru.aston.aston02.repository.VinylDiscRepository;
@@ -24,9 +26,11 @@ import java.util.Properties;
 import static org.junit.jupiter.api.Assertions.*;
 import static ru.aston.aston02.TestData.*;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = TestConfig.class)
-class JDBCVinylDiscRepositoryTest {
+@SpringJUnitConfig
+@WebAppConfiguration
+@ContextConfiguration(classes = {TestConfig.class})
+@Testcontainers
+public class DataJpaVinylDiscRepositoryTest {
     private static PostgreSQLContainer<?> container;
     private static final Properties PROPERTIES;
 
@@ -43,12 +47,14 @@ class JDBCVinylDiscRepositoryTest {
         PROPERTIES = new Properties();
     }
 
+    public DataJpaVinylDiscRepositoryTest() {
+    }
+
     @BeforeAll
     static void beforeClass() throws Exception {
-        try (InputStream inputStream = JDBCVinylDiscRepositoryTest.class.getClassLoader().getResourceAsStream("db/postgres.properties")) {
+        try (InputStream inputStream = DataJpaVinylDiscRepositoryTest.class.getClassLoader().getResourceAsStream("db/postgres.properties")) {
             PROPERTIES.load(inputStream);
         } catch (IOException e) {
-            e.printStackTrace();
             throw new RuntimeException("Failed to load properties", e);
         }
 
@@ -66,7 +72,8 @@ class JDBCVinylDiscRepositoryTest {
 
         dbUrl = container.getJdbcUrl();
 
-        repository = new JDBCVinylDiscRepository(dbUrl, dbUsername, dbPassword);
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(TestConfig.class);
+        repository = context.getBean(VinylDiscRepository.class);
     }
 
     @AfterAll
@@ -81,6 +88,16 @@ class JDBCVinylDiscRepositoryTest {
             statement.execute("TRUNCATE TABLE vinyl_disc_artist, song, artist, vinyl_disc, genre, instrument RESTART IDENTITY CASCADE;");
         }
         repository.save(DUMMY_DISC);
+    }
+
+    @Test
+    void testConnection() {
+        try (Connection connection = container.createConnection("")) {
+            assertNotNull(connection);
+            assertFalse(connection.isClosed());
+        } catch (SQLException e) {
+            fail("Failed to connect to the database: " + e.getMessage());
+        }
     }
 
     @Test

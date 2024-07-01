@@ -6,7 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import ru.aston.aston02.TestUtil;
-import ru.aston.aston02.model.VinylDisc;
+import ru.aston.aston02.model.dto.VinylDiscDto;
 import ru.aston.aston02.service.VinylDiscServiceImpl;
 
 import javax.servlet.ServletConfig;
@@ -47,7 +47,7 @@ class VinylDiscServletTest {
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
 
-        List<VinylDisc> discList = Collections.emptyList();
+        List<VinylDiscDto> discList = Collections.emptyList();
 
         when(request.getPathInfo()).thenReturn("/");
         when(response.getWriter()).thenReturn(printWriter);
@@ -86,7 +86,7 @@ class VinylDiscServletTest {
         servlet.doPost(request, response);
 
         verify(request, times(1)).getInputStream();
-        verify(service, times(1)).saveVinylDisc(any(VinylDisc.class));
+        verify(service, times(1)).saveVinylDisc(any(VinylDiscDto.class));
     }
 
     @Test
@@ -97,7 +97,7 @@ class VinylDiscServletTest {
         servlet.doPost(request, response);
 
         verify(request, times(1)).getInputStream();
-        verify(service, times(1)).updateVinylDisc(anyLong(), any(VinylDisc.class));
+        verify(service, times(1)).updateVinylDisc(anyLong(), any(VinylDiscDto.class));
     }
 }
 

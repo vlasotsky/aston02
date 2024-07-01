@@ -1,7 +1,7 @@
 package ru.aston.aston02;
 
 import ru.aston.aston02.model.VinylDisc;
-import ru.aston.aston02.repository.Repository;
+import ru.aston.aston02.repository.VinylDiscRepository;
 import ru.aston.aston02.repository.jdbc.JDBCVinylDiscRepository;
 
 import java.io.FileNotFoundException;
@@ -19,7 +19,7 @@ public class Config {
     private final String username;
     private final String password;
 
-    private final Repository<Long, VinylDisc> repository;
+    private final VinylDiscRepository<Long, VinylDisc> repository;
 
     private Config() {
         try (InputStream inputStream = Config.class.getClassLoader().getResourceAsStream(PROPERTIES)) {
@@ -48,7 +48,7 @@ public class Config {
         return DriverManager.getConnection(url, username, password);
     }
 
-    public static Repository<Long, VinylDisc> getRepository() {
+    public static VinylDiscRepository<Long, VinylDisc> getRepository() {
         return INSTANCE.repository;
     }
 }

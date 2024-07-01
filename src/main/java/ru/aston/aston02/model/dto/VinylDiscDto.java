@@ -1,4 +1,4 @@
-package ru.aston.aston02.model.to;
+package ru.aston.aston02.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -12,13 +12,16 @@ import java.util.List;
 import java.util.Objects;
 
 public class VinylDiscDto {
-    private final String title;
-    private final List<Artist> artists;
-    private final List<Song> songs;
-    private final Genre genre;
-    private final String label;
-    private final LocalDate releaseDate;
-    private final boolean isFew;
+    private String title;
+    private List<Artist> artists;
+    private List<Song> songs;
+    private Genre genre;
+    private String label;
+    private LocalDate releaseDate;
+    private boolean isFew;
+
+    public VinylDiscDto() {
+    }
 
     public VinylDiscDto(VinylDisc disc, boolean isFew) {
         this.title = disc.getTitle();
