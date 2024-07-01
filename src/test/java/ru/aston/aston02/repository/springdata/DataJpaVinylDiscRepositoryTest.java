@@ -5,7 +5,11 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import ru.aston.aston02.TestConfig;
 import ru.aston.aston02.model.*;
 import ru.aston.aston02.repository.VinylDiscRepository;
@@ -22,7 +26,11 @@ import java.util.Properties;
 import static org.junit.jupiter.api.Assertions.*;
 import static ru.aston.aston02.TestData.*;
 
-class DataJpaVinylDiscRepositoryTest {
+@SpringJUnitConfig
+@WebAppConfiguration
+@ContextConfiguration(classes = {TestConfig.class})
+@Testcontainers
+public class DataJpaVinylDiscRepositoryTest {
     private static PostgreSQLContainer<?> container;
     private static final Properties PROPERTIES;
 
@@ -37,6 +45,9 @@ class DataJpaVinylDiscRepositoryTest {
     static {
         DB_NAME = "vinyl_collection";
         PROPERTIES = new Properties();
+    }
+
+    public DataJpaVinylDiscRepositoryTest() {
     }
 
     @BeforeAll
