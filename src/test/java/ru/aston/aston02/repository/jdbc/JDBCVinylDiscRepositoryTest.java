@@ -4,7 +4,11 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.PostgreSQLContainer;
+import ru.aston.aston02.TestConfig;
 import ru.aston.aston02.model.*;
 import ru.aston.aston02.repository.VinylDiscRepository;
 
@@ -20,6 +24,8 @@ import java.util.Properties;
 import static org.junit.jupiter.api.Assertions.*;
 import static ru.aston.aston02.TestData.*;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = TestConfig.class)
 class JDBCVinylDiscRepositoryTest {
     private static PostgreSQLContainer<?> container;
     private static final Properties PROPERTIES;

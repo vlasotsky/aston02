@@ -9,10 +9,7 @@ import java.util.List;
 @Repository
 public class DataJpaVinylDiscRepository implements VinylDiscRepository<Long, VinylDisc> {
 
-    private CrudVinylDiscRepository crudVinylDiscRepository;
-
-    public DataJpaVinylDiscRepository() {
-    }
+    private final CrudVinylDiscRepository crudVinylDiscRepository;
 
     public DataJpaVinylDiscRepository(CrudVinylDiscRepository crudVinylDiscRepository) {
         this.crudVinylDiscRepository = crudVinylDiscRepository;
